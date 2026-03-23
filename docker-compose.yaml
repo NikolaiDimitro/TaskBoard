@@ -1,16 +1,17 @@
 version: "3.8"
 
 services: 
-    sqlserver:
-        container_name: sqlserver
-        image: mcr.microsoft.com/mssql/server
+    postgres:
+        container_name: postgres
+        image: postgres:15
         ports: 
-            - "1433:1433"
+            - "5432:5432"
         environment:
-            - ACCEPT_EULA=Y
-            - MSSQL_SA_PASSWORD=yourStrongPassword12#
+            - POSTGRES_DB=MyDB
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=yourStrongPassword12#
         volumes: 
-            - sqldata:/var/opt/mssql
+            - pgdata:/var/lib/postgresql/data
     web-app:
         container_name: web-app
         build:
@@ -20,4 +21,4 @@ services:
         restart: on-failure
 
 volumes:
-    sqldata:
+    pgdata:
