@@ -1,10 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using System.Text.RegularExpressions;
 
-using TaskBoard.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -12,8 +7,10 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 // Remove SQL Server-specific parameters that Npgsql doesn't support
 if (!string.IsNullOrEmpty(connectionString))
 {
-    connectionString = connectionString.Replace("MultipleActiveResultSets=true;", "")
-                                       .Replace("MultipleActiveResultSets=false;", "");
+    // Remove MultipleActiveResultSets parameter (case-insensitive)
+    connectionString  = Regex.Replace(connectionString, @"(?i)MultipleActiveResultSets\s*=\s*(?:true|false|yes|no)\s*;?", "", RegexOptions.IgnoreCase);
+    // Clean up any double semicolons or trailing semicolons
+    connectionString = connectionString.Replace(";;", ";").TrimEnd(';');
 }
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
