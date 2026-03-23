@@ -9,6 +9,13 @@ using TaskBoard.Data;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+// Remove SQL Server-specific parameters that Npgsql doesn't support
+if (!string.IsNullOrEmpty(connectionString))
+{
+    connectionString = connectionString.Replace("MultipleActiveResultSets=true;", "")
+                                       .Replace("MultipleActiveResultSets=false;", "");
+}
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString)); ;
 
